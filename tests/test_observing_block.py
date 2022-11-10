@@ -23,29 +23,35 @@ import unittest
 import uuid
 
 import pydantic
-from lsst.ts.observing import ObservingBlock, ObservingScript, SchedulingConstraints
+from lsst.ts.observing import AirmassConstraint, ObservingBlock, ObservingScript, SeeingConstraint
 
 
 class TestConstraints(unittest.TestCase):
     def test_airmass(self):
-        c = SchedulingConstraints(airmass_min=1.4)
-        self.assertEqual(c.airmass_min, 1.4)
+        c = AirmassConstraint(min=1.4)
+        self.assertEqual(c.min, 1.4)
 
         with self.assertRaises(pydantic.ValidationError):
-            SchedulingConstraints(airmass_min=0.5)
+            AirmassConstraint(min=0.5)
 
 
 class TestObservingBlock(unittest.TestCase):
     def test_basic(self):
         # No validation of script names or script parameters.
 
-        script1 = ObservingScript(name="slew", parameters={"target": "W48"})
-        script2 = ObservingScript(name="standard_visit", parameters={"exptime": 30.0})
+        script1 = ObservingScript(name="slew", standard=True, parameters={"target": "W48"})
+        script2 = ObservingScript(name="standard_visit", standard=False, parameters={"exptime": 30.0})
 
-        block = ObservingBlock(name="Testing", scripts=[script1, script2])
+        block = ObservingBlock(
+            name="Testing", scripts=[script1, script2], constraints=[AirmassConstraint(min=1.5)]
+        )
 
         self.assertEqual(block.name, "Testing")
         self.assertEqual(len(block.scripts), 2)
+        self.assertEqual(len(block.constraints), 1)
+
+        block.add_constraint(SeeingConstraint(max=0.5))
+        self.assertEqual(len(block.constraints), 2)
 
         # Round trip via json.
         new = ObservingBlock.parse_obj(json.loads(block.json()))

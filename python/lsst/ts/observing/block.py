@@ -24,29 +24,57 @@ from __future__ import annotations
 Classes supporting observing blocks.
 """
 
-__all__ = ["ObservingBlock", "ObservingScript", "SchedulingConstraints"]
+__all__ = ["ObservingBlock", "ObservingScript", "AirmassConstraint", "SeeingConstraint"]
 
 import uuid
-from typing import Any
+from typing import Any, Literal, Union
 
 from pydantic import BaseModel, Field, validator
+from typing_extensions import Annotated
 
 
-class SchedulingConstraints(BaseModel):
-    """Scheduling constraints to apply to an ObservingBlock."""
+class SchedulingConstraint(BaseModel):
+    class Config:
+        extra = "allow"
+        allow_mutation = False
 
-    # A key question here is whether different types of constraints are
-    # handled as their own Constraint classes or if we enumerate
-    # constraints here as an explicit list. For now use a list.
 
-    airmass_min: float | None = None
+class AirmassConstraint(SchedulingConstraint):
+    """A constraint on the airmass of the target."""
+
+    name: Literal["airmass"] = "airmass"
+    """Constraint name."""
+
+    min: float
     """Minimum airmass for this observation."""
 
-    @validator("airmass_min")
-    def check_airmass(cls, v):  # noqa: N805
+    @validator("min")
+    def check_min(cls, v):  # noqa: N805
         if v < 1.0:
             raise ValueError(f"Airmass must b >= 1.0 not {v!r}")
         return v
+
+
+class SeeingConstraint(SchedulingConstraint):
+    """A constraint on the DIMM seeing value."""
+
+    name: Literal["seeing"] = "seeing"
+    """Constraint name."""
+
+    max: float
+    """Maximum DIMM seeing for this observation in arcsec."""
+
+    @validator("max")
+    def check_max(cls, v):  # noqa: N805
+        if v < 0.0:
+            raise ValueError("Maximum seeing must be positive.")
+        return v
+
+
+# Explicitly declare all the constraint classes allowed and tell pydantic
+# that the name field should be used to work out which class to instantiate
+# when reconstructing from JSON.
+SchedulingConstraints = Annotated[Union[AirmassConstraint, SeeingConstraint], Field(discriminator="name")]
 
 
 class ObservingScript(BaseModel):
@@ -74,8 +102,24 @@ class ObservingBlock(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
     """Unique identifier of this block."""
 
-    constraints: SchedulingConstraints | None = None
+    # Ideally constraints would be a set with only one allowed per type.
+    constraints: list[SchedulingConstraints] = Field(default_factory=list)
     """Constraints to apply when scheduling this block."""
 
     scripts: list[ObservingScript]
     """Ordered list of observing scripts to execute."""
+
+    def add_constraint(self, constraint: SchedulingConstraints) -> None:
+        """Add a new constraint to the observing block.
+
+        Parameters
+        ----------
+        constraint : `SchedulingConstraint`
+            The new constraint.
+        """
+        if not isinstance(constraint, SchedulingConstraint):
+            raise ValueError("Constraint has the wrong type.")
+
+        # Do not check yet if we are replacing a previous constraint.
+        self.constraints.append(constraint)
+        return
