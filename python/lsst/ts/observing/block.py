@@ -102,6 +102,9 @@ class ObservingBlock(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
     """Unique identifier of this block."""
 
+    program: str
+    """Observing program of which this block is a part."""
+
     # Ideally constraints would be a set with only one allowed per type.
     constraints: list[SchedulingConstraints] = Field(default_factory=list)
     """Constraints to apply when scheduling this block."""

@@ -43,10 +43,14 @@ class TestObservingBlock(unittest.TestCase):
         script2 = ObservingScript(name="standard_visit", standard=False, parameters={"exptime": 30.0})
 
         block = ObservingBlock(
-            name="Testing", scripts=[script1, script2], constraints=[AirmassConstraint(min=1.5)]
+            name="OBS-123",
+            program="SITCOM-456",
+            scripts=[script1, script2],
+            constraints=[AirmassConstraint(min=1.5)],
         )
 
-        self.assertEqual(block.name, "Testing")
+        self.assertEqual(block.name, "OBS-123")
+        self.assertEqual(block.program, "SITCOM-456")
         self.assertEqual(len(block.scripts), 2)
         self.assertEqual(len(block.constraints), 1)
 
@@ -59,7 +63,7 @@ class TestObservingBlock(unittest.TestCase):
 
         # Ensure that an external UUID can override.
         our_id = uuid.uuid4()
-        block = ObservingBlock(name="Testing", scripts=[script1, script2], id=our_id)
+        block = ObservingBlock(name="Testing", program="Something", scripts=[script1, script2], id=our_id)
         self.assertEqual(block.id, our_id)
 
 
