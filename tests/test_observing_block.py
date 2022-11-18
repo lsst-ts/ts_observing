@@ -23,16 +23,32 @@ import unittest
 import uuid
 
 import pydantic
-from lsst.ts.observing import AirmassConstraint, ObservingBlock, ObservingScript, SeeingConstraint
+from lsst.ts.observing import (
+    AirmassConstraint,
+    ObservingBlock,
+    ObservingScript,
+    SeeingConstraint,
+    SkyBrightnessConstraint,
+)
 
 
 class TestConstraints(unittest.TestCase):
     def test_airmass(self):
-        c = AirmassConstraint(min=1.4)
-        self.assertEqual(c.min, 1.4)
+        c = AirmassConstraint(max=1.4)
+        self.assertEqual(c.max, 1.4)
 
         with self.assertRaises(pydantic.ValidationError):
-            AirmassConstraint(min=0.5)
+            AirmassConstraint(max=0.5)
+
+    def test_sky_brightness(self):
+        c = SkyBrightnessConstraint(max=2.0, band="u")
+        self.assertEqual(c.band, "u")
+
+        with self.assertRaises(pydantic.ValidationError):
+            SkyBrightnessConstraint(max=1.0, band="x")
+
+        with self.assertRaises(pydantic.ValidationError):
+            SkyBrightnessConstraint(max=-1.0, band="u")
 
 
 class TestObservingBlock(unittest.TestCase):
@@ -46,7 +62,7 @@ class TestObservingBlock(unittest.TestCase):
             name="OBS-123",
             program="SITCOM-456",
             scripts=[script1, script2],
-            constraints=[AirmassConstraint(min=1.5)],
+            constraints=[AirmassConstraint(max=1.5)],
         )
 
         self.assertEqual(block.name, "OBS-123")
@@ -56,6 +72,7 @@ class TestObservingBlock(unittest.TestCase):
 
         block.add_constraint(SeeingConstraint(max=0.5))
         self.assertEqual(len(block.constraints), 2)
+        block.add_constraint(SkyBrightnessConstraint(max=10.0, band="u"))
 
         # Round trip via json.
         new = ObservingBlock.parse_obj(json.loads(block.json()))

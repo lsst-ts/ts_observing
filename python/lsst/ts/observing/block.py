@@ -24,7 +24,16 @@ from __future__ import annotations
 Classes supporting observing blocks.
 """
 
-__all__ = ["ObservingBlock", "ObservingScript", "AirmassConstraint", "SeeingConstraint"]
+__all__ = [
+    "ObservingBlock",
+    "ObservingScript",
+    "AirmassConstraint",
+    "SkyBrightnessConstraint",
+    "MoonBrightnessConstraint",
+    "MoonDistanceConstraint",
+    "CloudExtinctionConstraint",
+    "SeeingConstraint",
+]
 
 import uuid
 from typing import Any, Literal, Union
@@ -45,13 +54,90 @@ class AirmassConstraint(SchedulingConstraint):
     name: Literal["airmass"] = "airmass"
     """Constraint name."""
 
-    min: float
-    """Minimum airmass for this observation."""
+    max: float
+    """Maximum airmass for this observation."""
 
-    @validator("min")
-    def check_min(cls, v):  # noqa: N805
+    @validator("max")
+    def check_max(cls, v):  # noqa: N805
         if v < 1.0:
             raise ValueError(f"Airmass must b >= 1.0 not {v!r}")
+        return v
+
+
+class MoonBrightnessConstraint(SchedulingConstraint):
+    """A constraint on the moon brightness."""
+
+    name: Literal["moon_brightness"] = "moon_brightness"
+    """Constraint name."""
+
+    max: float
+    """Relative Moon brightness (0.0 to 1.0)."""
+
+    @validator("max")
+    def check_max(cls, v):  # noqa: N805
+        if v <= 1.0 and v >= 0.0:
+            raise ValueError(f"Moon constraint must be between 0 and 1, not {v!r}.")
+        return v
+
+
+class MoonDistanceConstraint(SchedulingConstraint):
+    """A constraint on the moon distance."""
+
+    name: Literal["moon_distance"] = "moon_distance"
+    """Constraint name."""
+
+    max: float
+    """Minimum distance of target from Moon (0.0 to 180.0 deg)."""
+
+    @validator("max")
+    def check_max(cls, v):  # noqa: N805
+        if v <= 1.0 and v >= 0.0:
+            raise ValueError(f"Moon constraint must be between 0 and 1, not {v!r}.")
+        return v
+
+
+class SkyBrightnessConstraint(SchedulingConstraint):
+    """Maximum sky brightness allowed for this observation."""
+
+    name: Literal["sky_brightness"] = "sky_brightness"
+    """Constraint name."""
+
+    max: float
+    """Maximum allowed sky brightness (mag)."""
+
+    # Including the band in the class has some advantages over having
+    # class per-band, although a class per-band allows you to more easily
+    # ensure that you aren't duplicating constraints by checking that
+    # you don't have two constraints of the same class.
+    band: str
+    """Observing band for which this sky brightness is relevant (ugrizy)."""
+
+    @validator("band")
+    def check_band(cls, v):  # noqa: N805
+        if v not in (bands := "ugrizy"):
+            raise ValueError(f"Band constraint must be one of {bands} not {v!r}.")
+        return v
+
+    @validator("max")
+    def check_max(cls, v):  # noqa: N805
+        if v < 0.0:
+            raise ValueError(f"Sky brightness constraint must be positive, not {v!r}.")
+        return v
+
+
+class CloudExtinctionConstraint(SchedulingConstraint):
+    """Maximum cloud extinction allowed for this observation."""
+
+    name: Literal["cloud_extinction"] = "cloud_extinction"
+    """Constraint name."""
+
+    max: float
+    """Maximum allowed cloud extinction."""
+
+    @validator("max")
+    def check_max(cls, v):  # noqa: N805
+        if v < 0.0:
+            raise ValueError(f"Cloud extinction must be positive, not {v!r}.")
         return v
 
 
@@ -67,14 +153,24 @@ class SeeingConstraint(SchedulingConstraint):
     @validator("max")
     def check_max(cls, v):  # noqa: N805
         if v < 0.0:
-            raise ValueError("Maximum seeing must be positive.")
+            raise ValueError(f"Maximum seeing must be positive, not {v!r}.")
         return v
 
 
 # Explicitly declare all the constraint classes allowed and tell pydantic
 # that the name field should be used to work out which class to instantiate
 # when reconstructing from JSON.
-SchedulingConstraints = Annotated[Union[AirmassConstraint, SeeingConstraint], Field(discriminator="name")]
+SchedulingConstraints = Annotated[
+    Union[
+        AirmassConstraint,
+        MoonBrightnessConstraint,
+        MoonDistanceConstraint,
+        CloudExtinctionConstraint,
+        SkyBrightnessConstraint,
+        SeeingConstraint,
+    ],
+    Field(discriminator="name"),
+]
 
 
 class ObservingScript(BaseModel):
