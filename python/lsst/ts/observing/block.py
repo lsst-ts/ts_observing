@@ -36,10 +36,9 @@ __all__ = [
 ]
 
 import uuid
-from typing import Any, Literal, Union
+from typing import Annotated, Any, Literal, Union
 
 from pydantic import BaseModel, Field, validator
-from typing_extensions import Annotated
 
 
 class SchedulingConstraint(BaseModel):
