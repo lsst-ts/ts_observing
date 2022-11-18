@@ -1,6 +1,29 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "lsst-ts-observing"
 description = "Specifying observations at Rubin Observatory"
+keywords = ["lsst"]
+dependencies = [
+    "pydantic",
+]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+]
+dynamic = ["version"]
+
+[tool.setuptools.packages.find]
+where = ["python"]
+
+[tool.setuptools.package-data]
+"lsst.ts.observing" = ["py.typed"]
 
 [tool.black]
 line-length = 110
@@ -10,7 +33,11 @@ target-version = ["py310"]
 profile = "black"
 line_length = 110
 
+[tool.setuptools_scm]
+write_to = "python/lsst/ts/observing/version.py"
+
 [tool.lsst_versions]
+# Needed for the mypy action.
 write_to = "python/lsst/ts/observing/version.py"
 
 [tool.pytest.ini_options]
