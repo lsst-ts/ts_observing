@@ -74,8 +74,10 @@ class MoonBrightnessConstraint(SchedulingConstraint):
 
     @validator("max")
     def check_max(cls, v):  # noqa: N805
-        if v <= 1.0 and v >= 0.0:
-            raise ValueError(f"Moon constraint must be between 0 and 1, not {v!r}.")
+        b_min = 0.0
+        b_max = 1.0
+        if v < b_min or v > b_max:
+            raise ValueError(f"Moon brightness constraint must be between {b_min} and {b_max}, not {v!r}.")
         return v
 
 
@@ -90,8 +92,10 @@ class MoonDistanceConstraint(SchedulingConstraint):
 
     @validator("max")
     def check_max(cls, v):  # noqa: N805
-        if v <= 1.0 and v >= 0.0:
-            raise ValueError(f"Moon constraint must be between 0 and 1, not {v!r}.")
+        d_min = 0.0
+        d_max = 180.0
+        if v < d_min or v > d_max:
+            raise ValueError(f"Moon distance constraint must be between {d_min} and {d_max}, not {v!r}.")
         return v
 
 

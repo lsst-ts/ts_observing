@@ -25,6 +25,9 @@ import uuid
 import pydantic
 from lsst.ts.observing import (
     AirmassConstraint,
+    CloudExtinctionConstraint,
+    MoonBrightnessConstraint,
+    MoonDistanceConstraint,
     ObservingBlock,
     ObservingScript,
     SeeingConstraint,
@@ -50,6 +53,46 @@ class TestConstraints(unittest.TestCase):
         with self.assertRaises(pydantic.ValidationError):
             SkyBrightnessConstraint(max=-1.0, band="u")
 
+    def test_moon_brightness(self):
+        b = MoonBrightnessConstraint(max=0.8)
+        self.assertEqual(b.max, 0.8)
+
+        with self.assertRaises(pydantic.ValidationError):
+            MoonBrightnessConstraint(max=1.5)
+
+        with self.assertRaises(pydantic.ValidationError):
+            MoonBrightnessConstraint(max=-2.0)
+
+        with self.assertRaises(pydantic.ValidationError):
+            MoonBrightnessConstraint(max="half")
+
+    def test_moon_distance(self):
+        b = MoonDistanceConstraint(max=90.0)
+        self.assertEqual(b.max, 90.0)
+
+        with self.assertRaises(pydantic.ValidationError):
+            MoonDistanceConstraint(max=190.0)
+
+        with self.assertRaises(pydantic.ValidationError):
+            MoonDistanceConstraint(max=-2.0)
+
+    def test_cloud_extinction(self):
+        e = CloudExtinctionConstraint(max=8.0)
+        self.assertEqual(e.max, 8.0)
+
+        with self.assertRaises(pydantic.ValidationError):
+            CloudExtinctionConstraint(max=-10.0)
+
+        with self.assertRaises(pydantic.ValidationError):
+            CloudExtinctionConstraint(max="cirrus")
+
+    def test_seeing(self):
+        s = SeeingConstraint(max=0.4)
+        self.assertEqual(s.max, 0.4)
+
+        with self.assertRaises(pydantic.ValidationError):
+            SeeingConstraint(max=-0.1)
+
 
 class TestObservingBlock(unittest.TestCase):
     def test_basic(self):
@@ -73,6 +116,9 @@ class TestObservingBlock(unittest.TestCase):
         block.add_constraint(SeeingConstraint(max=0.5))
         self.assertEqual(len(block.constraints), 2)
         block.add_constraint(SkyBrightnessConstraint(max=10.0, band="u"))
+
+        with self.assertRaises(ValueError):
+            block.add_constraint({"moon_brightness": 0.8})
 
         # Round trip via json.
         new = ObservingBlock.parse_obj(json.loads(block.json()))
