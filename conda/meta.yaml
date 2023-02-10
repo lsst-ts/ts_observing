@@ -1,0 +1,40 @@
+{% set data= load_setup_py_data() %}
+package:
+  name: ts-observing
+  version: {{ data.get('version') }}
+
+source:
+  path: ../
+
+build:
+  noarch: python
+  script: {{ PYTHON }} -m pip install --no-deps --ignore-installed .
+
+test:
+  requires:
+    - ts-conda-build =0.3
+    - pydantic
+  source_files:
+    - python
+    - tests
+    - setup.cfg
+    - pyproject.toml
+  commands:
+    - pytest
+
+requirements:
+  host:
+    - python {{ python }}
+    - numpy {{ numpy }}
+    - pip
+    - setuptools_scm
+    - setuptools
+  build:
+    - python {{ python }}
+    - numpy {{ numpy }}
+    - setuptools_scm
+    - setuptools
+  run:
+    - python {{ python }}
+    - pyyaml
+    - pydantic
