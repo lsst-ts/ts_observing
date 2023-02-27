@@ -3,7 +3,7 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "lsst-ts-observing"
+name = "ts-observing"
 description = "Specifying observations at Rubin Observatory"
 keywords = ["lsst"]
 dependencies = [

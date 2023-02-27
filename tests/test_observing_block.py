@@ -94,6 +94,14 @@ class TestConstraints(unittest.TestCase):
             SeeingConstraint(max=-0.1)
 
 
+class TestObservingScript(unittest.TestCase):
+    def test_get_script_configuration(self):
+        script = ObservingScript(name="slew", standard=True, parameters={"target": "W48"})
+
+        script_config = script.get_script_configuration()
+        self.assertEqual(script_config, "target: W48\n")
+
+
 class TestObservingBlock(unittest.TestCase):
     def test_basic(self):
         # No validation of script names or script parameters.

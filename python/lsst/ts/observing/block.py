@@ -38,6 +38,7 @@ __all__ = [
 import uuid
 from typing import Annotated, Any, Literal, Union
 
+import yaml
 from pydantic import BaseModel, Field, validator
 
 
@@ -188,6 +189,16 @@ class ObservingScript(BaseModel):
 
     parameters: dict[str, Any]
     """Parameters to pass to the observing script."""
+
+    def get_script_configuration(self) -> str:
+        """Get script configuration as a yaml string.
+
+        Returns
+        -------
+        config : `str`
+            Script configuration.
+        """
+        return yaml.safe_dump(self.parameters)
 
 
 class ObservingBlock(BaseModel):
