@@ -198,7 +198,7 @@ class ObservingScript(BaseModel):
         config : `str`
             Script configuration.
         """
-        return yaml.safe_dump(self.parameters)
+        return yaml.safe_dump(self.parameters) if self.parameters else ""
 
 
 class ObservingBlock(BaseModel):
