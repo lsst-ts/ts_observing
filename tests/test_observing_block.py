@@ -101,6 +101,12 @@ class TestObservingScript(unittest.TestCase):
         script_config = script.get_script_configuration()
         self.assertEqual(script_config, "target: W48\n")
 
+    def test_get_script_configuration_empty_config(self):
+        script = ObservingScript(name="stop_tracking", standard=True, parameters={})
+
+        script_config = script.get_script_configuration()
+        self.assertEqual(script_config, "")
+
 
 class TestObservingBlock(unittest.TestCase):
     def test_basic(self):
