@@ -41,8 +41,6 @@ write_to = "python/lsst/ts/observing/version.py"
 write_to = "python/lsst/ts/observing/version.py"
 
 [tool.pytest.ini_options]
-addopts = "--flake8"
-flake8-ignore = ["W503", "E203"]
 
 [tool.pydocstyle]
 convention = "numpy"
