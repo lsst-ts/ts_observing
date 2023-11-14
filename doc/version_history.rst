@@ -4,6 +4,12 @@
 Version History
 ===============
 
+v0.1.2
+======
+
+* Fix an issue when generating script configuration that contain sexagesimal coordinates starting with "+0".
+  These coordinates were dumped without quotes around the coordinates which breaks the parsing of the configuration.
+
 v0.1.1
 ======
 
