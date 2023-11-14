@@ -198,7 +198,18 @@ class ObservingScript(BaseModel):
         config : `str`
             Script configuration.
         """
-        return yaml.safe_dump(self.parameters) if self.parameters else ""
+
+        def represent_string_with_colon(dumper, data):
+            if ":" in data:
+                return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="'")
+            return dumper.represent_scalar("tag:yaml.org,2002:str", data)
+
+        yaml.representer.SafeRepresenter.add_representer(str, represent_string_with_colon)
+        return (
+            yaml.safe_dump(self.parameters, default_flow_style=False, sort_keys=False)
+            if self.parameters
+            else ""
+        )
 
 
 class ObservingBlock(BaseModel):
