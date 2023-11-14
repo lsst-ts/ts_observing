@@ -107,6 +107,22 @@ class TestObservingScript(unittest.TestCase):
         script_config = script.get_script_configuration()
         self.assertEqual(script_config, "")
 
+    def test_get_script_configuration_with_coord(self):
+        script = ObservingScript(
+            name="slew",
+            standard=True,
+            parameters={"target": "Target1", "ra": "+0:12:34", "dec": "-30:00:00"},
+        )
+
+        script_config = script.get_script_configuration()
+        self.assertEqual(
+            script_config,
+            """target: Target1
+ra: '+0:12:34'
+dec: '-30:00:00'
+""",
+        )
+
 
 class TestObservingBlock(unittest.TestCase):
     def test_basic(self):
