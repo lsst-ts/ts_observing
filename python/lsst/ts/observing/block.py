@@ -39,7 +39,7 @@ import uuid
 from typing import Annotated, Any, Literal, Union
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field, validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class SchedulingConstraint(BaseModel):
@@ -56,8 +56,9 @@ class AirmassConstraint(SchedulingConstraint):
     max: float
     """Maximum airmass for this observation."""
 
-    @validator("max")
-    def check_max(cls, v):  # noqa: N805
+    @field_validator("max")
+    @classmethod
+    def check_max(cls, v: float) -> float:
         if v < 1.0:
             raise ValueError(f"Airmass must b >= 1.0 not {v!r}")
         return v
@@ -72,8 +73,9 @@ class MoonBrightnessConstraint(SchedulingConstraint):
     max: float
     """Relative Moon brightness (0.0 to 1.0)."""
 
-    @validator("max")
-    def check_max(cls, v):  # noqa: N805
+    @field_validator("max")
+    @classmethod
+    def check_max(cls, v: float) -> float:
         b_min = 0.0
         b_max = 1.0
         if v < b_min or v > b_max:
@@ -90,8 +92,9 @@ class MoonDistanceConstraint(SchedulingConstraint):
     max: float
     """Minimum distance of target from Moon (0.0 to 180.0 deg)."""
 
-    @validator("max")
-    def check_max(cls, v):  # noqa: N805
+    @field_validator("max")
+    @classmethod
+    def check_max(cls, v: float) -> float:
         d_min = 0.0
         d_max = 180.0
         if v < d_min or v > d_max:
@@ -115,14 +118,16 @@ class SkyBrightnessConstraint(SchedulingConstraint):
     band: str
     """Observing band for which this sky brightness is relevant (ugrizy)."""
 
-    @validator("band")
-    def check_band(cls, v):  # noqa: N805
+    @field_validator("band")
+    @classmethod
+    def check_band(cls, v: str) -> str:
         if v not in (bands := "ugrizy"):
             raise ValueError(f"Band constraint must be one of {bands} not {v!r}.")
         return v
 
-    @validator("max")
-    def check_max(cls, v):  # noqa: N805
+    @field_validator("max")
+    @classmethod
+    def check_max(cls, v: float) -> float:
         if v < 0.0:
             raise ValueError(f"Sky brightness constraint must be positive, not {v!r}.")
         return v
@@ -137,8 +142,9 @@ class CloudExtinctionConstraint(SchedulingConstraint):
     max: float
     """Maximum allowed cloud extinction."""
 
-    @validator("max")
-    def check_max(cls, v):  # noqa: N805
+    @field_validator("max")
+    @classmethod
+    def check_max(cls, v: float) -> float:
         if v < 0.0:
             raise ValueError(f"Cloud extinction must be positive, not {v!r}.")
         return v
@@ -153,8 +159,9 @@ class SeeingConstraint(SchedulingConstraint):
     max: float
     """Maximum DIMM seeing for this observation in arcsec."""
 
-    @validator("max")
-    def check_max(cls, v):  # noqa: N805
+    @field_validator("max")
+    @classmethod
+    def check_max(cls, v: float) -> float:
         if v < 0.0:
             raise ValueError(f"Maximum seeing must be positive, not {v!r}.")
         return v
