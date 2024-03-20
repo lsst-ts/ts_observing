@@ -39,13 +39,12 @@ import uuid
 from typing import Annotated, Any, Literal, Union
 
 import yaml
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, ConfigDict, Field, validator
 
 
 class SchedulingConstraint(BaseModel):
-    class Config:
-        extra = "allow"
-        allow_mutation = False
+
+    model_config = ConfigDict(extra="allow", frozen=True)
 
 
 class AirmassConstraint(SchedulingConstraint):
