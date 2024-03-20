@@ -35,6 +35,8 @@ from lsst.ts.observing import (
 
 
 class TestConstraints(unittest.TestCase):
+    """Test constraints can be constructed and validated."""
+
     def test_airmass(self):
         c = AirmassConstraint(max=1.4)
         self.assertEqual(c.max, 1.4)
@@ -94,6 +96,8 @@ class TestConstraints(unittest.TestCase):
 
 
 class TestObservingScript(unittest.TestCase):
+    """Test that observing scripts can be constructed."""
+
     def test_get_script_configuration(self):
         script = ObservingScript(name="slew", standard=True, parameters={"target": "W48"})
 
@@ -124,6 +128,8 @@ dec: '-30:00:00'
 
 
 class TestObservingBlock(unittest.TestCase):
+    """Test that observing blocks can be constructed."""
+
     def test_basic(self):
         # No validation of script names or script parameters.
 
