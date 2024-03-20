@@ -18,7 +18,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import json
 import unittest
 import uuid
 
@@ -151,7 +150,7 @@ class TestObservingBlock(unittest.TestCase):
             block.add_constraint({"moon_brightness": 0.8})
 
         # Round trip via json.
-        new = ObservingBlock.parse_obj(json.loads(block.json()))
+        new = ObservingBlock.model_validate_json(block.model_dump_json())
         self.assertEqual(new, block)
 
         # Ensure that an external UUID can override.
