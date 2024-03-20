@@ -18,11 +18,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import annotations
+"""Classes supporting observing blocks."""
 
-"""
-Classes supporting observing blocks.
-"""
+from __future__ import annotations
 
 __all__ = [
     "ObservingBlock",
@@ -36,13 +34,14 @@ __all__ = [
 ]
 
 import uuid
-from typing import Annotated, Any, Literal, Union
+from typing import Annotated, Any, Literal
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class SchedulingConstraint(BaseModel):
+    """Base class for all scheduling constraints."""
 
     model_config = ConfigDict(extra="allow", frozen=True)
 
@@ -171,20 +170,18 @@ class SeeingConstraint(SchedulingConstraint):
 # that the name field should be used to work out which class to instantiate
 # when reconstructing from JSON.
 SchedulingConstraints = Annotated[
-    Union[
-        AirmassConstraint,
-        MoonBrightnessConstraint,
-        MoonDistanceConstraint,
-        CloudExtinctionConstraint,
-        SkyBrightnessConstraint,
-        SeeingConstraint,
-    ],
+    AirmassConstraint
+    | MoonBrightnessConstraint
+    | MoonDistanceConstraint
+    | CloudExtinctionConstraint
+    | SkyBrightnessConstraint
+    | SeeingConstraint,
     Field(discriminator="name"),
 ]
 
 
 class ObservingScript(BaseModel):
-    """A representation of a single observing script with parameters"""
+    """A representation of a single observing script with parameters."""
 
     name: str
     """Name of observing script to run."""
