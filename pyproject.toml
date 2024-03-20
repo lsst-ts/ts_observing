@@ -7,7 +7,8 @@ name = "ts-observing"
 description = "Specifying observations at Rubin Observatory"
 keywords = ["lsst"]
 dependencies = [
-    "pydantic",
+    "pydantic >= 2.0, < 3.0",
+    "pyyaml",
 ]
 classifiers = [
     "Intended Audience :: Science/Research",
