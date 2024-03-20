@@ -43,7 +43,7 @@ jobs:
         run: uv pip install --system --no-deps -v -e .
 
       - name: Run tests
-        run: pytest -r a -v -n 3 --open-files --cov=tests --cov=lsst.pex.config --cov-report=xml --cov-report=term
+        run: pytest -r a -v -n 3 --open-files --cov=tests --cov=lsst.ts.observing --cov-report=xml --cov-report=term
 
       - name: Upload coverage to codecov
         uses: codecov/codecov-action@v2
