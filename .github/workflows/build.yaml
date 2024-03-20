@@ -28,17 +28,19 @@ jobs:
           cache: "pip"
 
       - name: Install prereqs for setuptools
-        run: pip install wheel
+        run: |
+          pip install uv
+          uv pip install --system wheel
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: uv pip install --system -r requirements.txt
 
       # We have two cores so we can speed up the testing with xdist
       - name: Install xdist, openfiles for pytest
-        run: pip install pytest-xdist pytest-openfiles pytest-cov
+        run: uv pip install --system pytest-xdist pytest-openfiles pytest-cov
 
       - name: Build and install
-        run: pip install --no-deps -v .
+        run: uv pip install --system --no-deps -v -e .
 
       - name: Run tests
         run: pytest -r a -v -n 3 --open-files --cov=tests --cov=lsst.pex.config --cov-report=xml --cov-report=term
