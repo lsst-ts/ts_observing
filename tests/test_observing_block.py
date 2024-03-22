@@ -18,7 +18,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import json
 import unittest
 import uuid
 
@@ -36,6 +35,8 @@ from lsst.ts.observing import (
 
 
 class TestConstraints(unittest.TestCase):
+    """Test constraints can be constructed and validated."""
+
     def test_airmass(self):
         c = AirmassConstraint(max=1.4)
         self.assertEqual(c.max, 1.4)
@@ -95,6 +96,8 @@ class TestConstraints(unittest.TestCase):
 
 
 class TestObservingScript(unittest.TestCase):
+    """Test that observing scripts can be constructed."""
+
     def test_get_script_configuration(self):
         script = ObservingScript(name="slew", standard=True, parameters={"target": "W48"})
 
@@ -125,6 +128,8 @@ dec: '-30:00:00'
 
 
 class TestObservingBlock(unittest.TestCase):
+    """Test that observing blocks can be constructed."""
+
     def test_basic(self):
         # No validation of script names or script parameters.
 
@@ -151,7 +156,7 @@ class TestObservingBlock(unittest.TestCase):
             block.add_constraint({"moon_brightness": 0.8})
 
         # Round trip via json.
-        new = ObservingBlock.parse_obj(json.loads(block.json()))
+        new = ObservingBlock.model_validate_json(block.model_dump_json())
         self.assertEqual(new, block)
 
         # Ensure that an external UUID can override.
