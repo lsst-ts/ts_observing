@@ -1,3 +1,5 @@
+# yamllint disable-file
+# The templating line is not valid yaml so linter checks are disabled.
 {% set data= load_setup_py_data() %}
 package:
   name: ts-observing
