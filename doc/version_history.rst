@@ -4,6 +4,13 @@
 Version History
 ===============
 
+v0.2.0
+======
+
+* Add block configuration schema to the ``ObservingBlock`` class.
+  This will allow users to specify additional parameters for blocks, allowing to customize block execution at runtime.
+
+
 v0.1.2
 ======
 
