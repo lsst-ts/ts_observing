@@ -236,6 +236,9 @@ class ObservingBlock(BaseModel):
     scripts: list[ObservingScript]
     """Ordered list of observing scripts to execute."""
 
+    configuration_schema: str = ""
+    """A json schema defining the configuration for the block."""
+
     def add_constraint(self, constraint: SchedulingConstraints) -> None:
         """Add a new constraint to the observing block.
 

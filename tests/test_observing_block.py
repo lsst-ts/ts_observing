@@ -147,6 +147,7 @@ class TestObservingBlock(unittest.TestCase):
         self.assertEqual(block.program, "SITCOM-456")
         self.assertEqual(len(block.scripts), 2)
         self.assertEqual(len(block.constraints), 1)
+        self.assertEqual(block.configuration_schema, "")
 
         block.add_constraint(SeeingConstraint(max=0.5))
         self.assertEqual(len(block.constraints), 2)
