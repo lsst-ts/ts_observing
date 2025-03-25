@@ -4,6 +4,11 @@
 Version History
 ===============
 
+v0.2.1
+======
+
+* Update version of ts-conda-build in the conda recipe.
+
 v0.2.0
 ======
 
