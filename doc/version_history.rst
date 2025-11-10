@@ -4,6 +4,11 @@
 Version History
 ===============
 
+v0.2.2
+======
+
+* Update conda recipe.
+
 v0.2.1
 ======
 
